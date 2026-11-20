@@ -1,0 +1,31 @@
+{
+  "name": "a malformed answer is an outage",
+  "description": "A lease without an integer granted of at least 0, or a body that is not JSON, is BillingUnavailable, never a silent zero. The same goes for entitlements and features; an empty JSON array is an empty set.",
+  "config": { "failure_policy": "deny", "breaker_cooldown": 0 },
+  "billing": {
+    "POST /leases": [
+      { "body": "oops" },
+      { "body": { "lease_id": "lease_x", "expires_at": null } },
+      { "body": { "lease_id": "lease_x", "granted": -1, "expires_at": null } },
+      { "body": { "lease_id": "lease_x", "granted": "12", "expires_at": null } }
+    ],
+    "GET /entitlements/org_a": [
+      { "body": "<html>" },
+      { "body": { "meters": 5 } }
+    ],
+    "GET /entitlements/org_a/features": [
+      { "body": { "features": {} } },
+      { "body": { "features": [], "account": { "suspended": false } } }
+    ]
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingUnavailable" } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingUnavailable" } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingUnavailable" } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingUnavailable" } },
+    { "op": "entitlements", "org": "org_a", "expect": { "error": "BillingUnavailable" } },
+    { "op": "entitlements", "org": "org_a", "expect": { "error": "BillingUnavailable" } },
+    { "op": "features", "org": "org_a", "expect": { "error": "BillingUnavailable" } },
+    { "op": "features", "org": "org_a", "expect": { "result": { "stale": false, "suspended": false, "features": {} } } }
+  ]
+}

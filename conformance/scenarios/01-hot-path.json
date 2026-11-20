@@ -1,0 +1,29 @@
+{
+  "name": "hot path stays local",
+  "description": "The first reservation leases a slice and reads the entitlements once; later reservations, commits and releases move the local slice without asking Billing.",
+  "config": {},
+  "billing": {
+    "POST /leases": [
+      { "body": { "lease_id": "lease_1", "granted": 100, "expires_at": "2027-01-15T08:05:00+00:00" } }
+    ],
+    "GET /entitlements/org_a": { "always": { "body": { "meters": {
+      "api": { "enabled": true, "allowance": 1000, "weight": 0.5, "overage": "block" }
+    } } } }
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 10, "save": "r1", "expect": { "result": { "backed_by_lease": true, "grace": false } } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_a" }
+    ] },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 90 } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 5, "save": "r2", "expect": { "result": { "backed_by_lease": true, "grace": false } } },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 85 } },
+    { "op": "commit", "ref": "r1", "actual": 7 },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 88 } },
+    { "op": "release", "ref": "r2" },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 93 } },
+    { "op": "balance", "org": "org_b", "meter": "api", "expect": { "result": 0 } },
+    { "op": "expect_requests", "requests": [] }
+  ]
+}

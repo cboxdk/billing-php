@@ -1,0 +1,46 @@
+{
+    "name": "cboxdk/billing-php",
+    "description": "PHP client for the Cbox Billing API, generated from its OpenAPI contract, with a hot-path enforcement client (leases, entitlements, features), webhook verification, pagination and typed errors.",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/cboxdk/cbox-billing/tree/main/sdks/php",
+    "keywords": ["cbox", "billing", "subscriptions", "usage-based-billing", "openapi", "sdk"],
+    "authors": [
+        {
+            "name": "Cbox",
+            "homepage": "https://github.com/cboxdk"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "guzzlehttp/guzzle": "^7.4.5",
+        "guzzlehttp/psr7": "^2.0"
+    },
+    "suggest": {
+        "ext-redis": "Share the enforcement client's state between processes with RedisStore::phpredis()",
+        "predis/predis": "Share the enforcement client's state between processes with RedisStore::predis()",
+        "ext-apcu": "Share the enforcement client's state between the PHP-FPM workers of one host with ApcuStore"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cbox\\Billing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cbox\\Billing\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

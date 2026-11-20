@@ -1,0 +1,34 @@
+{
+  "name": "an exhausted allowance is always refused",
+  "description": "Billing answered and granted nothing: QuotaExceeded with the lease's reason, even under the allow policy. can() is false.",
+  "config": { "failure_policy": "allow" },
+  "billing": {
+    "POST /leases": [
+      { "body": { "lease_id": "lease_1", "granted": 0, "expires_at": "2027-01-15T08:05:00+00:00" } },
+      { "body": { "lease_id": "lease_2", "granted": 0, "expires_at": "2027-01-15T08:05:00+00:00" } },
+      { "body": { "lease_id": "lease_3", "granted": 0, "expires_at": "2027-01-15T08:05:00+00:00", "reason": "credit_limit_reached" } },
+      { "body": { "lease_id": "lease_4", "granted": 0, "expires_at": "2027-01-15T08:05:00+00:00", "blocked": { "reason": "agreement_required", "agreement": { "key": "dpa", "version": "2" }, "portal_url": "https://billing.example.com/portal/agreements/dpa" } } },
+      { "body": { "lease_id": null, "granted": 0, "expires_at": null, "reason": "seat_required" } },
+      { "body": { "lease_id": "lease_6", "granted": 30, "expires_at": "2027-01-15T08:05:00+00:00", "reason": "overage_cap_reached" } }
+    ],
+    "GET /entitlements/org_a": { "always": { "body": { "meters": {} } } }
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 10, "expect": { "error": "QuotaExceeded", "reason": "quota_exhausted" } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 1, "expect": { "result": false } },
+    { "op": "reserve", "org": "org_a", "meter": "llm", "estimate": 5, "expect": { "error": "QuotaExceeded", "reason": "credit_limit_reached" } },
+    { "op": "reserve", "org": "org_a", "meter": "geo", "estimate": 1, "expect": { "error": "QuotaExceeded", "reason": "agreement_required" } },
+    { "op": "reserve", "org": "org_a", "meter": "docs", "estimate": 1, "expect": { "error": "QuotaExceeded", "reason": "seat_required" } },
+    { "op": "reserve", "org": "org_a", "meter": "bytes", "estimate": 50, "expect": { "error": "QuotaExceeded", "reason": "overage_cap_reached" } },
+    { "op": "balance", "org": "org_a", "meter": "bytes", "expect": { "result": 30 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "llm", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "geo", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "docs", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "bytes", "size": 100 } }
+    ] }
+  ]
+}

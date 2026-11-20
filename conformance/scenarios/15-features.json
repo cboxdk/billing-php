@@ -1,0 +1,43 @@
+{
+  "name": "features are deny by default",
+  "description": "A feature is on only when Billing grants it and the account is not suspended. A config feature's value is its value; a boolean feature's is true; an unknown or ungranted one has none. Features are cached like entitlements and invalidated by a webhook.",
+  "config": {},
+  "billing": {
+    "GET /entitlements/org_a/features": [
+      { "body": { "features": {
+        "sso": { "type": "boolean", "enabled": true, "value": null, "source": "plan" },
+        "max_projects": { "type": "config", "enabled": true, "value": 10, "source": "override" },
+        "saml": { "type": "boolean", "enabled": false, "value": null, "source": "default", "upgrade": { "required_plan": "business", "checkout_url": "https://billing.example.com/upgrade" } }
+      }, "account": { "standing": "good", "suspended": false, "suspended_at": null } } },
+      { "body": { "features": {
+        "sso": { "type": "boolean", "enabled": true, "value": null, "source": "plan" },
+        "max_projects": { "type": "config", "enabled": true, "value": 10, "source": "override" },
+        "saml": { "type": "boolean", "enabled": false, "value": null, "source": "default" }
+      }, "account": { "standing": "suspended", "suspended": true, "suspended_at": "2027-01-15T07:00:00+00:00" } } }
+    ]
+  },
+  "steps": [
+    { "op": "features", "org": "org_a", "expect": { "result": { "stale": false, "suspended": false, "features": {
+      "sso": { "type": "boolean", "enabled": true, "value": null, "source": "plan" },
+      "max_projects": { "type": "config", "enabled": true, "value": 10, "source": "override" },
+      "saml": { "type": "boolean", "enabled": false, "value": null, "source": "default" }
+    } } } },
+    { "op": "has_feature", "org": "org_a", "key": "sso", "expect": { "result": true } },
+    { "op": "has_feature", "org": "org_a", "key": "saml", "expect": { "result": false } },
+    { "op": "has_feature", "org": "org_a", "key": "nope", "expect": { "result": false } },
+    { "op": "feature_value", "org": "org_a", "key": "max_projects", "expect": { "result": 10 } },
+    { "op": "feature_value", "org": "org_a", "key": "sso", "expect": { "result": true } },
+    { "op": "feature_value", "org": "org_a", "key": "saml", "expect": { "result": null } },
+    { "op": "feature_value", "org": "org_a", "key": "nope", "expect": { "result": null } },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a/features" } ] },
+    { "op": "handle_webhook", "event": { "type": "entitlements.changed", "data": { "organization_ref": "org_a", "feature": "sso", "change": "grant" } }, "expect": { "result": true } },
+    { "op": "has_feature", "org": "org_a", "key": "sso", "expect": { "result": false } },
+    { "op": "feature_value", "org": "org_a", "key": "max_projects", "expect": { "result": null } },
+    { "op": "features", "org": "org_a", "expect": { "result": { "stale": false, "suspended": true, "features": {
+      "sso": { "type": "boolean", "enabled": true, "value": null, "source": "plan" },
+      "max_projects": { "type": "config", "enabled": true, "value": 10, "source": "override" },
+      "saml": { "type": "boolean", "enabled": false, "value": null, "source": "default" }
+    } } } },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a/features" } ] }
+  ]
+}

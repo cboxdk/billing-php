@@ -1,0 +1,58 @@
+{
+  "name": "outage under last_known",
+  "description": "Billing unreachable: a capped meter admits up to the last known allowance minus what was leased and admitted, then the outage grace, then refuses. A meter with no known entitlement uses only the grace. A disabled meter is refused; an unlimited one keeps admitting. The breaker stops further calls until it cools down. Unused outage units go back where they came from.",
+  "config": { "refill_threshold": 0, "grace_units": 5 },
+  "billing": {
+    "POST /leases": [
+      { "body": { "lease_id": "lease_x", "expires_at": "2027-01-15T08:05:00+00:00", "granted": 100 } },
+      { "network_error": true },
+      { "body": { "lease_id": "lease_x", "expires_at": "2027-01-15T08:05:00+00:00", "granted": 100 } }
+    ],
+    "GET /entitlements/org_a": { "always": { "body": { "meters": {
+      "api": { "enabled": true, "allowance": 150, "weight": 1, "overage": "block" },
+      "off": { "enabled": false, "allowance": null, "weight": null, "overage": "block" },
+      "ulim": { "enabled": true, "allowance": null, "weight": 1, "overage": "bill" }
+    } } } },
+    "POST /usage": [ { "body": { "ok": true, "accepted": 3, "regressed": 0, "ignored": 0 } } ]
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 90, "save": "r1", "expect": { "result": { "backed_by_lease": true, "grace": false } } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 30, "save": "r2", "expect": { "result": { "backed_by_lease": false, "grace": false } } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 20, "expect": { "result": true } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 21, "expect": { "result": false } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 21, "expect": { "error": "QuotaExceeded", "reason": "outage_limit" } },
+    { "op": "reserve", "org": "org_a", "meter": "other", "estimate": 4, "save": "r3", "expect": { "result": { "backed_by_lease": false, "grace": true } } },
+    { "op": "reserve", "org": "org_a", "meter": "other", "estimate": 2, "expect": { "error": "BillingUnavailable" } },
+    { "op": "release", "ref": "r3" },
+    { "op": "reserve", "org": "org_a", "meter": "other", "estimate": 2, "save": "r4", "expect": { "result": { "backed_by_lease": false, "grace": true } } },
+    { "op": "reserve", "org": "org_a", "meter": "off", "estimate": 1, "expect": { "error": "QuotaExceeded", "reason": "meter_disabled" } },
+    { "op": "reserve", "org": "org_a", "meter": "ulim", "estimate": 1000, "save": "r5", "expect": { "result": { "backed_by_lease": false, "grace": false } } },
+    { "op": "commit", "ref": "r2", "actual": 10 },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 40, "expect": { "result": true } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 41, "expect": { "result": false } },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 10 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } }
+    ] },
+    { "op": "advance", "seconds": 31 },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 20, "save": "r6", "expect": { "result": { "backed_by_lease": true, "grace": false } } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } }
+    ] },
+    { "op": "commit", "ref": "r4", "actual": 2 },
+    { "op": "commit", "ref": "r5", "actual": 1000 },
+    { "op": "commit", "ref": "r1", "actual": 90 },
+    { "op": "commit", "ref": "r6", "actual": 20 },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 90 } },
+    { "op": "report", "expect": { "result": 1 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /usage", "body": { "org": "org_a", "entries": [
+        { "meter": "api", "cumulative": 120, "seq": 3, "epoch": 1800000000000 },
+        { "meter": "other", "cumulative": 2, "seq": 1, "epoch": 1800000031000 },
+        { "meter": "ulim", "cumulative": 1000, "seq": 1, "epoch": 1800000031000 }
+      ] } }
+    ] }
+  ]
+}

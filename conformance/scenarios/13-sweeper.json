@@ -1,0 +1,32 @@
+{
+  "name": "the sweeper reclaims abandoned reservations",
+  "description": "A reservation older than reservation_ttl goes back to its slice when swept. Its late commit still records the usage and takes those units out again; its late release does nothing.",
+  "config": { "reservation_ttl": 60, "refill_threshold": 0 },
+  "billing": {
+    "POST /leases": [ { "body": { "lease_id": "lease_x", "expires_at": "2027-01-15T08:05:00+00:00", "granted": 100 } } ],
+    "GET /entitlements/org_a": { "always": { "body": { "meters": {} } } },
+    "POST /usage": [ { "body": { "ok": true, "accepted": 1, "regressed": 0, "ignored": 0 } } ]
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 10, "save": "r1" },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 20, "save": "r2" },
+    { "op": "advance", "seconds": 30 },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 5, "save": "r3" },
+    { "op": "sweep", "expect": { "result": 0 } },
+    { "op": "advance", "seconds": 31 },
+    { "op": "sweep", "expect": { "result": 2 } },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 95 } },
+    { "op": "commit", "ref": "r1", "actual": 4 },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 91 } },
+    { "op": "release", "ref": "r2" },
+    { "op": "commit", "ref": "r3", "actual": 5 },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 91 } },
+    { "op": "sweep", "expect": { "result": 0 } },
+    { "op": "report", "expect": { "result": 1 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "POST /usage", "body": { "org": "org_a", "entries": [ { "meter": "api", "cumulative": 9, "seq": 2, "epoch": 1800000061000 } ] } }
+    ] }
+  ]
+}

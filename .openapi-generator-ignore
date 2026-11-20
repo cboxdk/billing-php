@@ -1,0 +1,25 @@
+# Files the generator must never write. Hand-written files (helpers, tests, manifests, README)
+# live beside the generated ones and are listed here so `sdks/generate.sh` leaves them alone.
+# Generated per-model docs and test stubs are skipped: the reference is the OpenAPI contract.
+README.md
+docs/**
+git_push.sh
+.travis.yml
+.gitlab-ci.yml
+.github/**
+.gitignore
+composer.json
+phpunit.xml.dist
+.php-cs-fixer.dist.php
+.phplint.yml
+test/**
+tests/**
+src/CboxBilling.php
+src/Exception/**
+src/Idempotency.php
+src/Paginator.php
+src/Webhook.php
+LICENSE
+src/RetryPolicy.php
+src/Enforcement/**
+examples/**

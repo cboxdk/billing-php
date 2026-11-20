@@ -1,0 +1,23 @@
+{
+  "name": "a lease covers the whole estimate",
+  "description": "A reservation larger than lease_size leases its own size in one round trip. Leaving the slice at or below refill_threshold tops it up with lease_size, and the entitlements are not read again within snapshot_refresh.",
+  "config": { "lease_size": 100, "refill_threshold": 20 },
+  "billing": {
+    "POST /leases": [
+      { "body": { "lease_id": "lease_1", "granted": 250, "expires_at": "2027-01-15T08:05:00+00:00" } },
+      { "body": { "lease_id": "lease_2", "granted": 100, "expires_at": "2027-01-15T08:05:00+00:00" } }
+    ],
+    "GET /entitlements/org_a": { "always": { "body": { "meters": {
+      "api": { "enabled": true, "allowance": 1000, "weight": 0.5, "overage": "block" }
+    } } } }
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 250, "save": "r1" },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 250 } },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } }
+    ] },
+    { "op": "balance", "org": "org_a", "meter": "api", "expect": { "result": 100 } }
+  ]
+}

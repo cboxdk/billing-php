@@ -1,0 +1,273 @@
+{
+  "name": "usage is reported as running totals",
+  "description": "Commits add to a lifetime total per (organization, meter) with a sequence number and an epoch taken when the counter was first written. A failed report changes nothing; the next one sends the larger total. A commit of 0 records nothing, and report(org) reports only that organization. A stream unchanged since its last accepted report is not sent again.",
+  "config": {},
+  "billing": {
+    "POST /leases": {
+      "always": {
+        "body": {
+          "lease_id": "lease_x",
+          "granted": 100,
+          "expires_at": "2027-01-15T08:05:00+00:00"
+        }
+      }
+    },
+    "GET /entitlements/org_a": {
+      "always": {
+        "body": {
+          "meters": {}
+        }
+      }
+    },
+    "GET /entitlements/org_b": {
+      "always": {
+        "body": {
+          "meters": {}
+        }
+      }
+    },
+    "POST /usage": [
+      {
+        "body": {
+          "ok": true,
+          "accepted": 1,
+          "regressed": 0,
+          "ignored": 0
+        }
+      },
+      {
+        "status": 503,
+        "body": {
+          "error": "unavailable"
+        }
+      },
+      {
+        "body": {
+          "ok": true,
+          "accepted": 1,
+          "regressed": 0,
+          "ignored": 0
+        }
+      },
+      {
+        "body": {
+          "ok": true,
+          "accepted": 1,
+          "regressed": 0,
+          "ignored": 0
+        }
+      }
+    ]
+  },
+  "steps": [
+    {
+      "op": "report",
+      "expect": {
+        "result": 0
+      }
+    },
+    {
+      "op": "reserve",
+      "org": "org_a",
+      "meter": "api",
+      "estimate": 10,
+      "save": "r1"
+    },
+    {
+      "op": "commit",
+      "ref": "r1",
+      "actual": 0
+    },
+    {
+      "op": "report",
+      "expect": {
+        "result": 0
+      }
+    },
+    {
+      "op": "advance",
+      "seconds": 1
+    },
+    {
+      "op": "reserve",
+      "org": "org_a",
+      "meter": "api",
+      "estimate": 10,
+      "save": "r2"
+    },
+    {
+      "op": "commit",
+      "ref": "r2",
+      "actual": 7
+    },
+    {
+      "op": "reserve",
+      "org": "org_a",
+      "meter": "api",
+      "estimate": 5,
+      "save": "r3"
+    },
+    {
+      "op": "commit",
+      "ref": "r3",
+      "actual": 5
+    },
+    {
+      "op": "expect_requests",
+      "requests": [
+        {
+          "route": "POST /leases",
+          "body": {
+            "org": "org_a",
+            "meter": "api",
+            "size": 100
+          }
+        },
+        {
+          "route": "GET /entitlements/org_a"
+        }
+      ]
+    },
+    {
+      "op": "report",
+      "expect": {
+        "result": 1
+      }
+    },
+    {
+      "op": "expect_requests",
+      "requests": [
+        {
+          "route": "POST /usage",
+          "body": {
+            "org": "org_a",
+            "entries": [
+              {
+                "meter": "api",
+                "cumulative": 12,
+                "seq": 2,
+                "epoch": 1800000001000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "op": "reserve",
+      "org": "org_a",
+      "meter": "api",
+      "estimate": 3,
+      "save": "r4"
+    },
+    {
+      "op": "commit",
+      "ref": "r4",
+      "actual": 3
+    },
+    {
+      "op": "report",
+      "expect": {
+        "result": 0
+      }
+    },
+    {
+      "op": "report",
+      "expect": {
+        "result": 1
+      }
+    },
+    {
+      "op": "expect_requests",
+      "requests": [
+        {
+          "route": "POST /usage",
+          "body": {
+            "org": "org_a",
+            "entries": [
+              {
+                "meter": "api",
+                "cumulative": 15,
+                "seq": 3,
+                "epoch": 1800000001000
+              }
+            ]
+          }
+        },
+        {
+          "route": "POST /usage",
+          "body": {
+            "org": "org_a",
+            "entries": [
+              {
+                "meter": "api",
+                "cumulative": 15,
+                "seq": 3,
+                "epoch": 1800000001000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "op": "reserve",
+      "org": "org_b",
+      "meter": "api",
+      "estimate": 2,
+      "save": "r5"
+    },
+    {
+      "op": "commit",
+      "ref": "r5",
+      "actual": 2
+    },
+    {
+      "op": "report",
+      "org": "org_b",
+      "expect": {
+        "result": 1
+      }
+    },
+    {
+      "op": "expect_requests",
+      "requests": [
+        {
+          "route": "POST /leases",
+          "body": {
+            "org": "org_b",
+            "meter": "api",
+            "size": 100
+          }
+        },
+        {
+          "route": "GET /entitlements/org_b"
+        },
+        {
+          "route": "POST /usage",
+          "body": {
+            "org": "org_b",
+            "entries": [
+              {
+                "meter": "api",
+                "cumulative": 2,
+                "seq": 1,
+                "epoch": 1800000001000
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "op": "report",
+      "expect": {
+        "result": 0
+      }
+    },
+    {
+      "op": "expect_requests",
+      "requests": []
+    }
+  ]
+}

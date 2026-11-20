@@ -1,0 +1,28 @@
+{
+  "name": "a refusal is never an outage",
+  "description": "A 4xx other than 408 and 429 is BillingRefused under every policy, does not open the breaker, and can() says false.",
+  "config": { "failure_policy": "allow" },
+  "billing": {
+    "POST /leases": [
+      { "status": 401, "body": { "error": "Unauthenticated." } },
+      { "status": 403, "body": { "error": "insufficient_scope", "required_scope": "enforce" } },
+      { "status": 404, "body": { "error": "unknown_organization" } },
+      { "status": 422, "body": { "message": "The size field must be at least 1.", "errors": { "size": ["The size field must be at least 1."] } } }
+    ],
+    "GET /entitlements/org_a": [ { "status": 403, "body": { "error": "forbidden" } } ]
+  },
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingRefused", "status": 401 } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 1, "expect": { "error": "BillingRefused", "status": 403 } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 1, "expect": { "result": false } },
+    { "op": "reserve_many", "org": "org_a", "meters": { "api": 1, "tokens": 2 }, "expect": { "error": "BillingRefused", "status": 422 } },
+    { "op": "entitlements", "org": "org_a", "expect": { "error": "BillingRefused", "status": 403 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "POST /leases", "body": { "org": "org_a", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_a" }
+    ] }
+  ]
+}

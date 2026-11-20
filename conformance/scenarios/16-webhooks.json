@@ -1,0 +1,46 @@
+{
+  "name": "webhooks invalidate what changed",
+  "description": "Events that change what a customer holds invalidate that customer, named by organization_ref, organization_id, cbox_org_id or organization. plan.changed, or such an event that names nobody, invalidates everyone. Other events invalidate nothing. Invalidating also makes the next refill read the entitlements again, and that read fills the cache.",
+  "config": { "entitlements_ttl": 3600, "refill_threshold": 0 },
+  "billing": {
+    "GET /entitlements/org_a": { "always": { "body": { "meters": { "api": { "enabled": true, "allowance": 100, "weight": 1, "overage": "block" } } } } },
+    "GET /entitlements/org_b": { "always": { "body": { "meters": { "api": { "enabled": true, "allowance": 100, "weight": 1, "overage": "block" } } } } },
+    "GET /entitlements/org_c": { "always": { "body": { "meters": { "api": { "enabled": true, "allowance": 100, "weight": 1, "overage": "block" } } } } },
+    "POST /leases": { "always": { "body": { "lease_id": "lease_x", "expires_at": "2027-01-15T08:05:00+00:00", "granted": 100 } } }
+  },
+  "steps": [
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "entitlements", "org": "org_b" },
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a" }, { "route": "GET /entitlements/org_b" } ] },
+    { "op": "handle_webhook", "event": { "type": "invoice.paid", "data": { "organization_ref": "org_a" } }, "expect": { "result": false } },
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "expect_requests", "requests": [] },
+    { "op": "handle_webhook", "event": { "type": "entitlements.changed", "data": { "organization_id": "cust_1", "organization_ref": "org_a", "cbox_org_id": null, "meter": "api", "change": "saved" } }, "expect": { "result": true } },
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "entitlements", "org": "org_b" },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a" } ] },
+    { "op": "handle_webhook", "event": { "type": "subscription.changed", "data": { "organization_id": "org_b" } }, "expect": { "result": true } },
+    { "op": "entitlements", "org": "org_b" },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_b" } ] },
+    { "op": "handle_webhook", "event": { "type": "plan.changed", "data": { "plan": "pro" } }, "expect": { "result": true } },
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "entitlements", "org": "org_b" },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a" }, { "route": "GET /entitlements/org_b" } ] },
+    { "op": "handle_webhook", "event": { "type": "entitlements.changed", "data": {} }, "expect": { "result": true } },
+    { "op": "entitlements", "org": "org_a" },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a" } ] },
+    { "op": "reserve", "org": "org_c", "meter": "api", "estimate": 10, "save": "r1" },
+    { "op": "entitlements", "org": "org_c" },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_c", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_c" }
+    ] },
+    { "op": "handle_webhook", "event": { "type": "customer.suspended", "data": { "organization": "org_c" } }, "expect": { "result": true } },
+    { "op": "reserve", "org": "org_c", "meter": "api", "estimate": 95, "save": "r2" },
+    { "op": "expect_requests", "requests": [
+      { "route": "POST /leases", "body": { "org": "org_c", "meter": "api", "size": 100 } },
+      { "route": "GET /entitlements/org_c" }
+    ] }
+  ]
+}

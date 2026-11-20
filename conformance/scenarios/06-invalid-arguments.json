@@ -1,0 +1,14 @@
+{
+  "name": "invalid arguments ask nothing",
+  "description": "A non-positive estimate, an empty set or a set with a non-positive estimate is refused before Billing is asked. can() with a non-positive n is false.",
+  "config": {},
+  "billing": {},
+  "steps": [
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": 0, "expect": { "error": "InvalidArgument" } },
+    { "op": "reserve", "org": "org_a", "meter": "api", "estimate": -5, "expect": { "error": "InvalidArgument" } },
+    { "op": "reserve_many", "org": "org_a", "meters": {}, "expect": { "error": "InvalidArgument" } },
+    { "op": "reserve_many", "org": "org_a", "meters": { "api": 5, "tokens": 0 }, "expect": { "error": "InvalidArgument" } },
+    { "op": "can", "org": "org_a", "meter": "api", "n": 0, "expect": { "result": false } },
+    { "op": "expect_requests", "requests": [] }
+  ]
+}

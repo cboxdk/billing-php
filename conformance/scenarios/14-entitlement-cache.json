@@ -1,0 +1,40 @@
+{
+  "name": "entitlements are cached",
+  "description": "entitlements() is answered from the cache for entitlements_ttl seconds. When Billing cannot be reached, the cached answer is returned marked stale, and the next call asks again. invalidate() makes the next call ask, but keeps the answer as the outage fallback. A refusal is never hidden.",
+  "config": { "entitlements_ttl": 60 },
+  "billing": {
+    "GET /entitlements/org_a": [
+      { "body": { "meters": { "api": { "enabled": true, "allowance": 100, "weight": 0.5, "overage": "block", "window": { "per": "billing_period" } } }, "account": { "standing": "good", "suspended": false } } },
+      { "network_error": true },
+      { "body": { "meters": { "api": { "enabled": true, "allowance": 200, "weight": 0.5, "overage": "block" }, "off": { "enabled": false, "allowance": null, "weight": null, "overage": "block" } } } },
+      { "network_error": true },
+      { "status": 404, "body": { "error": "unknown_organization" } }
+    ]
+  },
+  "steps": [
+    { "op": "entitlements", "org": "org_a", "expect": { "result": { "stale": false, "meters": { "api": { "enabled": true, "allowance": 100, "weight": 0.5, "overage": "block" } } } } },
+    { "op": "entitlements", "org": "org_a", "expect": { "result": { "stale": false, "meters": { "api": { "enabled": true, "allowance": 100, "weight": 0.5, "overage": "block" } } } } },
+    { "op": "cost", "org": "org_a", "meter": "api", "units": 10, "expect": { "result": 5 } },
+    { "op": "cost", "org": "org_a", "meter": "nope", "units": 10, "expect": { "result": 0 } },
+    { "op": "expect_requests", "requests": [ { "route": "GET /entitlements/org_a" } ] },
+    { "op": "advance", "seconds": 61 },
+    { "op": "entitlements", "org": "org_a", "expect": { "result": { "stale": true, "meters": { "api": { "enabled": true, "allowance": 100, "weight": 0.5, "overage": "block" } } } } },
+    { "op": "entitlements", "org": "org_a", "expect": { "result": { "stale": false, "meters": {
+      "api": { "enabled": true, "allowance": 200, "weight": 0.5, "overage": "block" },
+      "off": { "enabled": false, "allowance": null, "weight": null, "overage": "block" }
+    } } } },
+    { "op": "cost", "org": "org_a", "meter": "off", "units": 10, "expect": { "result": 0 } },
+    { "op": "invalidate", "org": "org_a" },
+    { "op": "entitlements", "org": "org_a", "expect": { "result": { "stale": true, "meters": {
+      "api": { "enabled": true, "allowance": 200, "weight": 0.5, "overage": "block" },
+      "off": { "enabled": false, "allowance": null, "weight": null, "overage": "block" }
+    } } } },
+    { "op": "entitlements", "org": "org_a", "expect": { "error": "BillingRefused", "status": 404 } },
+    { "op": "expect_requests", "requests": [
+      { "route": "GET /entitlements/org_a" },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "GET /entitlements/org_a" },
+      { "route": "GET /entitlements/org_a" }
+    ] }
+  ]
+}
