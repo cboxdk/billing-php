@@ -74,6 +74,9 @@ class OrganizationsApi
 
     /** @var string[] $contentTypes **/
     public const contentTypes = [
+        'archiveOrganization' => [
+            'application/json',
+        ],
         'cancelLimitIncrease' => [
             'application/json',
         ],
@@ -81,6 +84,9 @@ class OrganizationsApi
             'application/json',
         ],
         'deleteEntitlementOverride' => [
+            'application/json',
+        ],
+        'deleteOrganization' => [
             'application/json',
         ],
         'getBillingParent' => [
@@ -98,6 +104,15 @@ class OrganizationsApi
         'listLimitIncreaseRequests' => [
             'application/json',
         ],
+        'mergeOrganization' => [
+            'application/json',
+        ],
+        'previewOrganizationMerge' => [
+            'application/json',
+        ],
+        'reactivateOrganization' => [
+            'application/json',
+        ],
         'removeBillingParent' => [
             'application/json',
         ],
@@ -111,6 +126,15 @@ class OrganizationsApi
             'application/json',
         ],
         'setBillingParent' => [
+            'application/json',
+        ],
+        'suspendOrganization' => [
+            'application/json',
+        ],
+        'unarchiveOrganization' => [
+            'application/json',
+        ],
+        'undoOrganizationMerge' => [
             'application/json',
         ],
         'updateEntitlementOverride' => [
@@ -165,6 +189,362 @@ class OrganizationsApi
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * Operation archiveOrganization
+     *
+     * Archive a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function archiveOrganization($org, $idempotencyKey = null, string $contentType = self::contentTypes['archiveOrganization'][0])
+    {
+        list($response) = $this->archiveOrganizationWithHttpInfo($org, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation archiveOrganizationWithHttpInfo
+     *
+     * Archive a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function archiveOrganizationWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['archiveOrganization'][0])
+    {
+        $request = $this->archiveOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation archiveOrganizationAsync
+     *
+     * Archive a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function archiveOrganizationAsync($org, $idempotencyKey = null, string $contentType = self::contentTypes['archiveOrganization'][0])
+    {
+        return $this->archiveOrganizationAsyncWithHttpInfo($org, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation archiveOrganizationAsyncWithHttpInfo
+     *
+     * Archive a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function archiveOrganizationAsyncWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['archiveOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->archiveOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'archiveOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function archiveOrganizationRequest($org, $idempotencyKey = null, string $contentType = self::contentTypes['archiveOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling archiveOrganization'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}/archive';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
     }
 
     /**
@@ -1206,6 +1586,362 @@ class OrganizationsApi
             $resourcePath = str_replace(
                 '{id}',
                 ObjectSerializer::toPathValue($id),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'DELETE',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation deleteOrganization
+     *
+     * Delete a customer with no history
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\DeleteOrganization200Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function deleteOrganization($org, $idempotencyKey = null, string $contentType = self::contentTypes['deleteOrganization'][0])
+    {
+        list($response) = $this->deleteOrganizationWithHttpInfo($org, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation deleteOrganizationWithHttpInfo
+     *
+     * Delete a customer with no history
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\DeleteOrganization200Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function deleteOrganizationWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['deleteOrganization'][0])
+    {
+        $request = $this->deleteOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\DeleteOrganization200Response',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\DeleteOrganization200Response',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\DeleteOrganization200Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation deleteOrganizationAsync
+     *
+     * Delete a customer with no history
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function deleteOrganizationAsync($org, $idempotencyKey = null, string $contentType = self::contentTypes['deleteOrganization'][0])
+    {
+        return $this->deleteOrganizationAsyncWithHttpInfo($org, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation deleteOrganizationAsyncWithHttpInfo
+     *
+     * Delete a customer with no history
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function deleteOrganizationAsyncWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['deleteOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\DeleteOrganization200Response';
+        $request = $this->deleteOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'deleteOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function deleteOrganizationRequest($org, $idempotencyKey = null, string $contentType = self::contentTypes['deleteOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling deleteOrganization'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
                 $resourcePath
             );
         }
@@ -2928,6 +3664,1138 @@ class OrganizationsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'GET',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation mergeOrganization
+     *
+     * Merge this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\MergeOrganizationRequest $mergeOrganizationRequest mergeOrganizationRequest (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['mergeOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function mergeOrganization($org, $mergeOrganizationRequest, $idempotencyKey = null, string $contentType = self::contentTypes['mergeOrganization'][0])
+    {
+        list($response) = $this->mergeOrganizationWithHttpInfo($org, $mergeOrganizationRequest, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation mergeOrganizationWithHttpInfo
+     *
+     * Merge this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\MergeOrganizationRequest $mergeOrganizationRequest (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['mergeOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function mergeOrganizationWithHttpInfo($org, $mergeOrganizationRequest, $idempotencyKey = null, string $contentType = self::contentTypes['mergeOrganization'][0])
+    {
+        $request = $this->mergeOrganizationRequest($org, $mergeOrganizationRequest, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 422:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation mergeOrganizationAsync
+     *
+     * Merge this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\MergeOrganizationRequest $mergeOrganizationRequest (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['mergeOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function mergeOrganizationAsync($org, $mergeOrganizationRequest, $idempotencyKey = null, string $contentType = self::contentTypes['mergeOrganization'][0])
+    {
+        return $this->mergeOrganizationAsyncWithHttpInfo($org, $mergeOrganizationRequest, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation mergeOrganizationAsyncWithHttpInfo
+     *
+     * Merge this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\MergeOrganizationRequest $mergeOrganizationRequest (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['mergeOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function mergeOrganizationAsyncWithHttpInfo($org, $mergeOrganizationRequest, $idempotencyKey = null, string $contentType = self::contentTypes['mergeOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->mergeOrganizationRequest($org, $mergeOrganizationRequest, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'mergeOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\MergeOrganizationRequest $mergeOrganizationRequest (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['mergeOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function mergeOrganizationRequest($org, $mergeOrganizationRequest, $idempotencyKey = null, string $contentType = self::contentTypes['mergeOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling mergeOrganization'
+            );
+        }
+
+        // verify the required parameter 'mergeOrganizationRequest' is set
+        if ($mergeOrganizationRequest === null || (is_array($mergeOrganizationRequest) && count($mergeOrganizationRequest) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $mergeOrganizationRequest when calling mergeOrganization'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}/merge';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($mergeOrganizationRequest)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                try {
+                    $httpBody = json_encode(ObjectSerializer::sanitizeForSerialization($mergeOrganizationRequest), JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                $httpBody = $mergeOrganizationRequest;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation previewOrganizationMerge
+     *
+     * Preview merging this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\PreviewOrganizationMergeRequest $previewOrganizationMergeRequest previewOrganizationMergeRequest (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['previewOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\PreviewOrganizationMerge200Response|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function previewOrganizationMerge($org, $previewOrganizationMergeRequest, string $contentType = self::contentTypes['previewOrganizationMerge'][0])
+    {
+        list($response) = $this->previewOrganizationMergeWithHttpInfo($org, $previewOrganizationMergeRequest, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation previewOrganizationMergeWithHttpInfo
+     *
+     * Preview merging this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\PreviewOrganizationMergeRequest $previewOrganizationMergeRequest (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['previewOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\PreviewOrganizationMerge200Response|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function previewOrganizationMergeWithHttpInfo($org, $previewOrganizationMergeRequest, string $contentType = self::contentTypes['previewOrganizationMerge'][0])
+    {
+        $request = $this->previewOrganizationMergeRequest($org, $previewOrganizationMergeRequest, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\PreviewOrganizationMerge200Response',
+                        $request,
+                        $response,
+                    );
+                case 422:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\PreviewOrganizationMerge200Response',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\PreviewOrganizationMerge200Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation previewOrganizationMergeAsync
+     *
+     * Preview merging this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\PreviewOrganizationMergeRequest $previewOrganizationMergeRequest (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['previewOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function previewOrganizationMergeAsync($org, $previewOrganizationMergeRequest, string $contentType = self::contentTypes['previewOrganizationMerge'][0])
+    {
+        return $this->previewOrganizationMergeAsyncWithHttpInfo($org, $previewOrganizationMergeRequest, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation previewOrganizationMergeAsyncWithHttpInfo
+     *
+     * Preview merging this customer into another
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\PreviewOrganizationMergeRequest $previewOrganizationMergeRequest (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['previewOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function previewOrganizationMergeAsyncWithHttpInfo($org, $previewOrganizationMergeRequest, string $contentType = self::contentTypes['previewOrganizationMerge'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\PreviewOrganizationMerge200Response';
+        $request = $this->previewOrganizationMergeRequest($org, $previewOrganizationMergeRequest, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'previewOrganizationMerge'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  \Cbox\Billing\Model\PreviewOrganizationMergeRequest $previewOrganizationMergeRequest (required)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['previewOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function previewOrganizationMergeRequest($org, $previewOrganizationMergeRequest, string $contentType = self::contentTypes['previewOrganizationMerge'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling previewOrganizationMerge'
+            );
+        }
+
+        // verify the required parameter 'previewOrganizationMergeRequest' is set
+        if ($previewOrganizationMergeRequest === null || (is_array($previewOrganizationMergeRequest) && count($previewOrganizationMergeRequest) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $previewOrganizationMergeRequest when calling previewOrganizationMerge'
+            );
+        }
+
+
+        $resourcePath = '/organizations/{org}/merge/preview';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($previewOrganizationMergeRequest)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                try {
+                    $httpBody = json_encode(ObjectSerializer::sanitizeForSerialization($previewOrganizationMergeRequest), JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                $httpBody = $previewOrganizationMergeRequest;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation reactivateOrganization
+     *
+     * Reactivate a suspended customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['reactivateOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function reactivateOrganization($org, $idempotencyKey = null, string $contentType = self::contentTypes['reactivateOrganization'][0])
+    {
+        list($response) = $this->reactivateOrganizationWithHttpInfo($org, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation reactivateOrganizationWithHttpInfo
+     *
+     * Reactivate a suspended customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['reactivateOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function reactivateOrganizationWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['reactivateOrganization'][0])
+    {
+        $request = $this->reactivateOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation reactivateOrganizationAsync
+     *
+     * Reactivate a suspended customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['reactivateOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function reactivateOrganizationAsync($org, $idempotencyKey = null, string $contentType = self::contentTypes['reactivateOrganization'][0])
+    {
+        return $this->reactivateOrganizationAsyncWithHttpInfo($org, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation reactivateOrganizationAsyncWithHttpInfo
+     *
+     * Reactivate a suspended customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['reactivateOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function reactivateOrganizationAsyncWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['reactivateOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->reactivateOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'reactivateOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['reactivateOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function reactivateOrganizationRequest($org, $idempotencyKey = null, string $contentType = self::contentTypes['reactivateOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling reactivateOrganization'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}/reactivate';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
@@ -4805,6 +6673,1119 @@ class OrganizationsApi
         $query = ObjectSerializer::buildQuery($queryParams);
         return new Request(
             'PUT',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation suspendOrganization
+     *
+     * Suspend a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  \Cbox\Billing\Model\SuspendOrganizationRequest|null $suspendOrganizationRequest suspendOrganizationRequest (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['suspendOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\PendingApproval|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function suspendOrganization($org, $idempotencyKey = null, $suspendOrganizationRequest = null, string $contentType = self::contentTypes['suspendOrganization'][0])
+    {
+        list($response) = $this->suspendOrganizationWithHttpInfo($org, $idempotencyKey, $suspendOrganizationRequest, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation suspendOrganizationWithHttpInfo
+     *
+     * Suspend a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  \Cbox\Billing\Model\SuspendOrganizationRequest|null $suspendOrganizationRequest (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['suspendOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\PendingApproval|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function suspendOrganizationWithHttpInfo($org, $idempotencyKey = null, $suspendOrganizationRequest = null, string $contentType = self::contentTypes['suspendOrganization'][0])
+    {
+        $request = $this->suspendOrganizationRequest($org, $idempotencyKey, $suspendOrganizationRequest, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 202:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\PendingApproval',
+                        $request,
+                        $response,
+                    );
+                case 422:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 202:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\PendingApproval',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 422:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CreateCreditPurchase422Response',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation suspendOrganizationAsync
+     *
+     * Suspend a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  \Cbox\Billing\Model\SuspendOrganizationRequest|null $suspendOrganizationRequest (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['suspendOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function suspendOrganizationAsync($org, $idempotencyKey = null, $suspendOrganizationRequest = null, string $contentType = self::contentTypes['suspendOrganization'][0])
+    {
+        return $this->suspendOrganizationAsyncWithHttpInfo($org, $idempotencyKey, $suspendOrganizationRequest, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation suspendOrganizationAsyncWithHttpInfo
+     *
+     * Suspend a customer
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  \Cbox\Billing\Model\SuspendOrganizationRequest|null $suspendOrganizationRequest (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['suspendOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function suspendOrganizationAsyncWithHttpInfo($org, $idempotencyKey = null, $suspendOrganizationRequest = null, string $contentType = self::contentTypes['suspendOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->suspendOrganizationRequest($org, $idempotencyKey, $suspendOrganizationRequest, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'suspendOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  \Cbox\Billing\Model\SuspendOrganizationRequest|null $suspendOrganizationRequest (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['suspendOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function suspendOrganizationRequest($org, $idempotencyKey = null, $suspendOrganizationRequest = null, string $contentType = self::contentTypes['suspendOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling suspendOrganization'
+            );
+        }
+
+
+
+
+        $resourcePath = '/organizations/{org}/suspend';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (isset($suspendOrganizationRequest)) {
+            if (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the body
+                try {
+                    $httpBody = json_encode(ObjectSerializer::sanitizeForSerialization($suspendOrganizationRequest), JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                $httpBody = $suspendOrganizationRequest;
+            }
+        } elseif (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation unarchiveOrganization
+     *
+     * Bring an archived customer back
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function unarchiveOrganization($org, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveOrganization'][0])
+    {
+        list($response) = $this->unarchiveOrganizationWithHttpInfo($org, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation unarchiveOrganizationWithHttpInfo
+     *
+     * Bring an archived customer back
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function unarchiveOrganizationWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveOrganization'][0])
+    {
+        $request = $this->unarchiveOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation unarchiveOrganizationAsync
+     *
+     * Bring an archived customer back
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function unarchiveOrganizationAsync($org, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveOrganization'][0])
+    {
+        return $this->unarchiveOrganizationAsyncWithHttpInfo($org, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation unarchiveOrganizationAsyncWithHttpInfo
+     *
+     * Bring an archived customer back
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function unarchiveOrganizationAsyncWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveOrganization'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->unarchiveOrganizationRequest($org, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'unarchiveOrganization'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveOrganization'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function unarchiveOrganizationRequest($org, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveOrganization'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling unarchiveOrganization'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}/unarchive';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
+            $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
+            $headers,
+            $httpBody
+        );
+    }
+
+    /**
+     * Operation undoOrganizationMerge
+     *
+     * Undo a customer merge
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['undoOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody
+     */
+    public function undoOrganizationMerge($org, $idempotencyKey = null, string $contentType = self::contentTypes['undoOrganizationMerge'][0])
+    {
+        list($response) = $this->undoOrganizationMergeWithHttpInfo($org, $idempotencyKey, $contentType);
+        return $response;
+    }
+
+    /**
+     * Operation undoOrganizationMergeWithHttpInfo
+     *
+     * Undo a customer merge
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['undoOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
+     * @throws \InvalidArgumentException
+     * @return array of \Cbox\Billing\Model\CustomerLifecycleState|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CustomerLifecycleRefusal|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
+     */
+    public function undoOrganizationMergeWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['undoOrganizationMerge'][0])
+    {
+        $request = $this->undoOrganizationMergeRequest($org, $idempotencyKey, $contentType);
+
+        try {
+            $options = $this->createHttpClientOption();
+            try {
+                $response = $this->client->send($request, $options);
+            } catch (RequestException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    $e->getResponse() ? $e->getResponse()->getHeaders() : null,
+                    $e->getResponse() ? (string) $e->getResponse()->getBody() : null
+                );
+            } catch (ConnectException $e) {
+                throw new ApiException(
+                    "[{$e->getCode()}] {$e->getMessage()}",
+                    (int) $e->getCode(),
+                    null,
+                    null
+                );
+            }
+
+            $statusCode = $response->getStatusCode();
+
+
+            switch($statusCode) {
+                case 200:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $request,
+                        $response,
+                    );
+                case 401:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 403:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 404:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $request,
+                        $response,
+                    );
+                case 409:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $request,
+                        $response,
+                    );
+                case 429:
+                    return $this->handleResponseWithDataType(
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $request,
+                        $response,
+                    );
+            }
+
+            
+
+            if ($statusCode < 200 || $statusCode > 299) {
+                throw new ApiException(
+                    sprintf(
+                        '[%d] Error connecting to the API (%s)',
+                        $statusCode,
+                        (string) $request->getUri()
+                    ),
+                    $statusCode,
+                    $response->getHeaders(),
+                    (string) $response->getBody()
+                );
+            }
+
+            return $this->handleResponseWithDataType(
+                '\Cbox\Billing\Model\CustomerLifecycleState',
+                $request,
+                $response,
+            );
+        } catch (ApiException $e) {
+            switch ($e->getCode()) {
+                case 200:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleState',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 401:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 403:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 404:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\ErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 409:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\CustomerLifecycleRefusal',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+                case 429:
+                    $data = ObjectSerializer::deserialize(
+                        $e->getResponseBody(),
+                        '\Cbox\Billing\Model\RateLimitErrorBody',
+                        $e->getResponseHeaders()
+                    );
+                    $e->setResponseObject($data);
+                    throw $e;
+            }
+        
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Operation undoOrganizationMergeAsync
+     *
+     * Undo a customer merge
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['undoOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function undoOrganizationMergeAsync($org, $idempotencyKey = null, string $contentType = self::contentTypes['undoOrganizationMerge'][0])
+    {
+        return $this->undoOrganizationMergeAsyncWithHttpInfo($org, $idempotencyKey, $contentType)
+            ->then(
+                function ($response) {
+                    return $response[0];
+                }
+            );
+    }
+
+    /**
+     * Operation undoOrganizationMergeAsyncWithHttpInfo
+     *
+     * Undo a customer merge
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['undoOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Promise\PromiseInterface
+     */
+    public function undoOrganizationMergeAsyncWithHttpInfo($org, $idempotencyKey = null, string $contentType = self::contentTypes['undoOrganizationMerge'][0])
+    {
+        $returnType = '\Cbox\Billing\Model\CustomerLifecycleState';
+        $request = $this->undoOrganizationMergeRequest($org, $idempotencyKey, $contentType);
+
+        return $this->client
+            ->sendAsync($request, $this->createHttpClientOption())
+            ->then(
+                function ($response) use ($returnType) {
+                    if ($returnType === '\SplFileObject') {
+                        $content = $response->getBody(); //stream goes to serializer
+                    } else {
+                        $content = (string) $response->getBody();
+                        if ($returnType !== 'string') {
+                            $content = json_decode($content);
+                        }
+                    }
+
+                    return [
+                        ObjectSerializer::deserialize($content, $returnType, []),
+                        $response->getStatusCode(),
+                        $response->getHeaders()
+                    ];
+                },
+                function ($exception) {
+                    $response = $exception->getResponse();
+                    $statusCode = $response->getStatusCode();
+                    throw new ApiException(
+                        sprintf(
+                            '[%d] Error connecting to the API (%s)',
+                            $statusCode,
+                            $exception->getRequest()->getUri()
+                        ),
+                        $statusCode,
+                        $response->getHeaders(),
+                        (string) $response->getBody()
+                    );
+                }
+            );
+    }
+
+    /**
+     * Create request for operation 'undoOrganizationMerge'
+     *
+     * @param  string $org The organization id (the merchant platform&#39;s own tenant key). (required)
+     * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
+     * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['undoOrganizationMerge'] to see the possible values for this operation
+     *
+     * @throws \InvalidArgumentException
+     * @return \GuzzleHttp\Psr7\Request
+     */
+    public function undoOrganizationMergeRequest($org, $idempotencyKey = null, string $contentType = self::contentTypes['undoOrganizationMerge'][0])
+    {
+
+        // verify the required parameter 'org' is set
+        if ($org === null || (is_array($org) && count($org) === 0)) {
+            throw new \InvalidArgumentException(
+                'Missing the required parameter $org when calling undoOrganizationMerge'
+            );
+        }
+
+
+
+        $resourcePath = '/organizations/{org}/merge/undo';
+        $formParams = [];
+        $queryParams = [];
+        $headerParams = [];
+        $httpBody = '';
+        $multipart = false;
+
+
+        // header params
+        if ($idempotencyKey !== null) {
+            $headerParams['Idempotency-Key'] = ObjectSerializer::toHeaderValue($idempotencyKey);
+        }
+
+        // path params
+        if ($org !== null) {
+            $resourcePath = str_replace(
+                '{org}',
+                ObjectSerializer::toPathValue($org),
+                $resourcePath
+            );
+        }
+
+
+        $headers = $this->headerSelector->selectHeaders(
+            ['application/json', ],
+            $contentType,
+            $multipart
+        );
+
+        // for model (json/xml)
+        if (count($formParams) > 0) {
+            if ($multipart) {
+                $multipartContents = [];
+                foreach ($formParams as $formParamName => $formParamValue) {
+                    $formParamValueItems = is_array($formParamValue) ? $formParamValue : [$formParamValue];
+                    foreach ($formParamValueItems as $formParamValueItem) {
+                        $multipartContents[] = [
+                            'name' => $formParamName,
+                            'contents' => $formParamValueItem
+                        ];
+                    }
+                }
+                // for HTTP post (form)
+                $httpBody = new MultipartStream($multipartContents);
+
+            } elseif (stripos($headers['Content-Type'], 'application/json') !== false) {
+                # if Content-Type contains "application/json", json_encode the form parameters
+                try {
+                    $httpBody = json_encode($formParams, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new \InvalidArgumentException('json_encode error: ' . $e->getMessage(), 0, $e);
+                }
+            } else {
+                // for HTTP post (form)
+                $httpBody = ObjectSerializer::buildQuery($formParams);
+            }
+        }
+
+        // this endpoint requires Bearer authentication (access token)
+        if (!empty($this->config->getAccessToken())) {
+            $headers['Authorization'] = 'Bearer ' . $this->config->getAccessToken();
+        }
+
+        $defaultHeaders = [];
+        if ($this->config->getUserAgent()) {
+            $defaultHeaders['User-Agent'] = $this->config->getUserAgent();
+        }
+
+        $headers = array_merge(
+            $defaultHeaders,
+            $headerParams,
+            $headers
+        );
+
+        $operationHost = $this->config->getHost();
+        $query = ObjectSerializer::buildQuery($queryParams);
+        return new Request(
+            'POST',
             $operationHost . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody

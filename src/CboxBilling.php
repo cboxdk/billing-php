@@ -29,7 +29,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class CboxBilling
 {
-    public const VERSION = '0.1.0';
+    public const VERSION = '0.2.0';
 
     private readonly Configuration $configuration;
 

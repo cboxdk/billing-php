@@ -148,7 +148,7 @@ class CouponsApi
      *
      * Archive a coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveCoupon'] to see the possible values for this operation
      *
@@ -156,9 +156,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody
      */
-    public function archiveCoupon($code, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
+    public function archiveCoupon($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
     {
-        list($response) = $this->archiveCouponWithHttpInfo($code, $idempotencyKey, $contentType);
+        list($response) = $this->archiveCouponWithHttpInfo($coupon, $idempotencyKey, $contentType);
         return $response;
     }
 
@@ -167,7 +167,7 @@ class CouponsApi
      *
      * Archive a coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveCoupon'] to see the possible values for this operation
      *
@@ -175,9 +175,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return array of \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
      */
-    public function archiveCouponWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
+    public function archiveCouponWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
     {
-        $request = $this->archiveCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->archiveCouponRequest($coupon, $idempotencyKey, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -323,16 +323,16 @@ class CouponsApi
      *
      * Archive a coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function archiveCouponAsync($code, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
+    public function archiveCouponAsync($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
     {
-        return $this->archiveCouponAsyncWithHttpInfo($code, $idempotencyKey, $contentType)
+        return $this->archiveCouponAsyncWithHttpInfo($coupon, $idempotencyKey, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -345,17 +345,17 @@ class CouponsApi
      *
      * Archive a coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function archiveCouponAsyncWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
+    public function archiveCouponAsyncWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
     {
         $returnType = '\Cbox\Billing\Model\CouponDefinitionDetail';
-        $request = $this->archiveCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->archiveCouponRequest($coupon, $idempotencyKey, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -396,29 +396,29 @@ class CouponsApi
     /**
      * Create request for operation 'archiveCoupon'
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['archiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function archiveCouponRequest($code, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
+    public function archiveCouponRequest($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['archiveCoupon'][0])
     {
 
-        // verify the required parameter 'code' is set
-        if ($code === null || (is_array($code) && count($code) === 0)) {
+        // verify the required parameter 'coupon' is set
+        if ($coupon === null || (is_array($coupon) && count($coupon) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $code when calling archiveCoupon'
+                'Missing the required parameter $coupon when calling archiveCoupon'
             );
         }
-        if (!preg_match("/^[A-Za-z0-9._-]+$/", $code)) {
-            throw new \InvalidArgumentException("invalid value for \"code\" when calling CouponsApi.archiveCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
+        if (!preg_match("/^[A-Za-z0-9._-]+$/", $coupon)) {
+            throw new \InvalidArgumentException("invalid value for \"coupon\" when calling CouponsApi.archiveCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
         }
         
 
 
-        $resourcePath = '/coupons/{code}/archive';
+        $resourcePath = '/coupons/{coupon}/archive';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -432,10 +432,10 @@ class CouponsApi
         }
 
         // path params
-        if ($code !== null) {
+        if ($coupon !== null) {
             $resourcePath = str_replace(
-                '{code}',
-                ObjectSerializer::toPathValue($code),
+                '{coupon}',
+                ObjectSerializer::toPathValue($coupon),
                 $resourcePath
             );
         }
@@ -889,7 +889,7 @@ class CouponsApi
      *
      * Delete a coupon that was never redeemed
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteCoupon'] to see the possible values for this operation
      *
@@ -897,9 +897,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \Cbox\Billing\Model\CouponDeleted|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody
      */
-    public function deleteCoupon($code, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
+    public function deleteCoupon($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
     {
-        list($response) = $this->deleteCouponWithHttpInfo($code, $idempotencyKey, $contentType);
+        list($response) = $this->deleteCouponWithHttpInfo($coupon, $idempotencyKey, $contentType);
         return $response;
     }
 
@@ -908,7 +908,7 @@ class CouponsApi
      *
      * Delete a coupon that was never redeemed
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteCoupon'] to see the possible values for this operation
      *
@@ -916,9 +916,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return array of \Cbox\Billing\Model\CouponDeleted|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
      */
-    public function deleteCouponWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
+    public function deleteCouponWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
     {
-        $request = $this->deleteCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->deleteCouponRequest($coupon, $idempotencyKey, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -1064,16 +1064,16 @@ class CouponsApi
      *
      * Delete a coupon that was never redeemed
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function deleteCouponAsync($code, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
+    public function deleteCouponAsync($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
     {
-        return $this->deleteCouponAsyncWithHttpInfo($code, $idempotencyKey, $contentType)
+        return $this->deleteCouponAsyncWithHttpInfo($coupon, $idempotencyKey, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -1086,17 +1086,17 @@ class CouponsApi
      *
      * Delete a coupon that was never redeemed
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function deleteCouponAsyncWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
+    public function deleteCouponAsyncWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
     {
         $returnType = '\Cbox\Billing\Model\CouponDeleted';
-        $request = $this->deleteCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->deleteCouponRequest($coupon, $idempotencyKey, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -1137,29 +1137,29 @@ class CouponsApi
     /**
      * Create request for operation 'deleteCoupon'
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['deleteCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function deleteCouponRequest($code, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
+    public function deleteCouponRequest($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['deleteCoupon'][0])
     {
 
-        // verify the required parameter 'code' is set
-        if ($code === null || (is_array($code) && count($code) === 0)) {
+        // verify the required parameter 'coupon' is set
+        if ($coupon === null || (is_array($coupon) && count($coupon) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $code when calling deleteCoupon'
+                'Missing the required parameter $coupon when calling deleteCoupon'
             );
         }
-        if (!preg_match("/^[A-Za-z0-9._-]+$/", $code)) {
-            throw new \InvalidArgumentException("invalid value for \"code\" when calling CouponsApi.deleteCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
+        if (!preg_match("/^[A-Za-z0-9._-]+$/", $coupon)) {
+            throw new \InvalidArgumentException("invalid value for \"coupon\" when calling CouponsApi.deleteCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
         }
         
 
 
-        $resourcePath = '/coupons/{code}';
+        $resourcePath = '/coupons/{coupon}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -1173,10 +1173,10 @@ class CouponsApi
         }
 
         // path params
-        if ($code !== null) {
+        if ($coupon !== null) {
             $resourcePath = str_replace(
-                '{code}',
-                ObjectSerializer::toPathValue($code),
+                '{coupon}',
+                ObjectSerializer::toPathValue($coupon),
                 $resourcePath
             );
         }
@@ -1248,16 +1248,16 @@ class CouponsApi
      *
      * Get a coupon and its latest redemptions
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['getCoupon'] to see the possible values for this operation
      *
      * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody
      */
-    public function getCoupon($code, string $contentType = self::contentTypes['getCoupon'][0])
+    public function getCoupon($coupon, string $contentType = self::contentTypes['getCoupon'][0])
     {
-        list($response) = $this->getCouponWithHttpInfo($code, $contentType);
+        list($response) = $this->getCouponWithHttpInfo($coupon, $contentType);
         return $response;
     }
 
@@ -1266,16 +1266,16 @@ class CouponsApi
      *
      * Get a coupon and its latest redemptions
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['getCoupon'] to see the possible values for this operation
      *
      * @throws \Cbox\Billing\ApiException on non-2xx response or if the response body is not in the expected format
      * @throws \InvalidArgumentException
      * @return array of \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
      */
-    public function getCouponWithHttpInfo($code, string $contentType = self::contentTypes['getCoupon'][0])
+    public function getCouponWithHttpInfo($coupon, string $contentType = self::contentTypes['getCoupon'][0])
     {
-        $request = $this->getCouponRequest($code, $contentType);
+        $request = $this->getCouponRequest($coupon, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -1407,15 +1407,15 @@ class CouponsApi
      *
      * Get a coupon and its latest redemptions
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['getCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getCouponAsync($code, string $contentType = self::contentTypes['getCoupon'][0])
+    public function getCouponAsync($coupon, string $contentType = self::contentTypes['getCoupon'][0])
     {
-        return $this->getCouponAsyncWithHttpInfo($code, $contentType)
+        return $this->getCouponAsyncWithHttpInfo($coupon, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -1428,16 +1428,16 @@ class CouponsApi
      *
      * Get a coupon and its latest redemptions
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['getCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function getCouponAsyncWithHttpInfo($code, string $contentType = self::contentTypes['getCoupon'][0])
+    public function getCouponAsyncWithHttpInfo($coupon, string $contentType = self::contentTypes['getCoupon'][0])
     {
         $returnType = '\Cbox\Billing\Model\CouponDefinitionDetail';
-        $request = $this->getCouponRequest($code, $contentType);
+        $request = $this->getCouponRequest($coupon, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -1478,27 +1478,27 @@ class CouponsApi
     /**
      * Create request for operation 'getCoupon'
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['getCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function getCouponRequest($code, string $contentType = self::contentTypes['getCoupon'][0])
+    public function getCouponRequest($coupon, string $contentType = self::contentTypes['getCoupon'][0])
     {
 
-        // verify the required parameter 'code' is set
-        if ($code === null || (is_array($code) && count($code) === 0)) {
+        // verify the required parameter 'coupon' is set
+        if ($coupon === null || (is_array($coupon) && count($coupon) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $code when calling getCoupon'
+                'Missing the required parameter $coupon when calling getCoupon'
             );
         }
-        if (!preg_match("/^[A-Za-z0-9._-]+$/", $code)) {
-            throw new \InvalidArgumentException("invalid value for \"code\" when calling CouponsApi.getCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
+        if (!preg_match("/^[A-Za-z0-9._-]+$/", $coupon)) {
+            throw new \InvalidArgumentException("invalid value for \"coupon\" when calling CouponsApi.getCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
         }
         
 
-        $resourcePath = '/coupons/{code}';
+        $resourcePath = '/coupons/{coupon}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -1508,10 +1508,10 @@ class CouponsApi
 
 
         // path params
-        if ($code !== null) {
+        if ($coupon !== null) {
             $resourcePath = str_replace(
-                '{code}',
-                ObjectSerializer::toPathValue($code),
+                '{coupon}',
+                ObjectSerializer::toPathValue($coupon),
                 $resourcePath
             );
         }
@@ -1932,7 +1932,7 @@ class CouponsApi
      *
      * Reinstate an archived coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveCoupon'] to see the possible values for this operation
      *
@@ -1940,9 +1940,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody
      */
-    public function unarchiveCoupon($code, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
+    public function unarchiveCoupon($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
     {
-        list($response) = $this->unarchiveCouponWithHttpInfo($code, $idempotencyKey, $contentType);
+        list($response) = $this->unarchiveCouponWithHttpInfo($coupon, $idempotencyKey, $contentType);
         return $response;
     }
 
@@ -1951,7 +1951,7 @@ class CouponsApi
      *
      * Reinstate an archived coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveCoupon'] to see the possible values for this operation
      *
@@ -1959,9 +1959,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return array of \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
      */
-    public function unarchiveCouponWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
+    public function unarchiveCouponWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
     {
-        $request = $this->unarchiveCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->unarchiveCouponRequest($coupon, $idempotencyKey, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -2107,16 +2107,16 @@ class CouponsApi
      *
      * Reinstate an archived coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function unarchiveCouponAsync($code, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
+    public function unarchiveCouponAsync($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
     {
-        return $this->unarchiveCouponAsyncWithHttpInfo($code, $idempotencyKey, $contentType)
+        return $this->unarchiveCouponAsyncWithHttpInfo($coupon, $idempotencyKey, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -2129,17 +2129,17 @@ class CouponsApi
      *
      * Reinstate an archived coupon
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function unarchiveCouponAsyncWithHttpInfo($code, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
+    public function unarchiveCouponAsyncWithHttpInfo($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
     {
         $returnType = '\Cbox\Billing\Model\CouponDefinitionDetail';
-        $request = $this->unarchiveCouponRequest($code, $idempotencyKey, $contentType);
+        $request = $this->unarchiveCouponRequest($coupon, $idempotencyKey, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -2180,29 +2180,29 @@ class CouponsApi
     /**
      * Create request for operation 'unarchiveCoupon'
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['unarchiveCoupon'] to see the possible values for this operation
      *
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function unarchiveCouponRequest($code, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
+    public function unarchiveCouponRequest($coupon, $idempotencyKey = null, string $contentType = self::contentTypes['unarchiveCoupon'][0])
     {
 
-        // verify the required parameter 'code' is set
-        if ($code === null || (is_array($code) && count($code) === 0)) {
+        // verify the required parameter 'coupon' is set
+        if ($coupon === null || (is_array($coupon) && count($coupon) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $code when calling unarchiveCoupon'
+                'Missing the required parameter $coupon when calling unarchiveCoupon'
             );
         }
-        if (!preg_match("/^[A-Za-z0-9._-]+$/", $code)) {
-            throw new \InvalidArgumentException("invalid value for \"code\" when calling CouponsApi.unarchiveCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
+        if (!preg_match("/^[A-Za-z0-9._-]+$/", $coupon)) {
+            throw new \InvalidArgumentException("invalid value for \"coupon\" when calling CouponsApi.unarchiveCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
         }
         
 
 
-        $resourcePath = '/coupons/{code}/unarchive';
+        $resourcePath = '/coupons/{coupon}/unarchive';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -2216,10 +2216,10 @@ class CouponsApi
         }
 
         // path params
-        if ($code !== null) {
+        if ($coupon !== null) {
             $resourcePath = str_replace(
-                '{code}',
-                ObjectSerializer::toPathValue($code),
+                '{coupon}',
+                ObjectSerializer::toPathValue($coupon),
                 $resourcePath
             );
         }
@@ -2291,7 +2291,7 @@ class CouponsApi
      *
      * Replace a coupon&#39;s definition
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  \Cbox\Billing\Model\CouponRequest $couponRequest couponRequest (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['updateCoupon'] to see the possible values for this operation
@@ -2300,9 +2300,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\RateLimitErrorBody
      */
-    public function updateCoupon($code, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
+    public function updateCoupon($coupon, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
     {
-        list($response) = $this->updateCouponWithHttpInfo($code, $couponRequest, $idempotencyKey, $contentType);
+        list($response) = $this->updateCouponWithHttpInfo($coupon, $couponRequest, $idempotencyKey, $contentType);
         return $response;
     }
 
@@ -2311,7 +2311,7 @@ class CouponsApi
      *
      * Replace a coupon&#39;s definition
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  \Cbox\Billing\Model\CouponRequest $couponRequest (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['updateCoupon'] to see the possible values for this operation
@@ -2320,9 +2320,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return array of \Cbox\Billing\Model\CouponDefinitionDetail|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\ErrorBody|\Cbox\Billing\Model\CreateCreditPurchase422Response|\Cbox\Billing\Model\RateLimitErrorBody, HTTP status code, HTTP response headers (array of strings)
      */
-    public function updateCouponWithHttpInfo($code, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
+    public function updateCouponWithHttpInfo($coupon, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
     {
-        $request = $this->updateCouponRequest($code, $couponRequest, $idempotencyKey, $contentType);
+        $request = $this->updateCouponRequest($coupon, $couponRequest, $idempotencyKey, $contentType);
 
         try {
             $options = $this->createHttpClientOption();
@@ -2482,7 +2482,7 @@ class CouponsApi
      *
      * Replace a coupon&#39;s definition
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  \Cbox\Billing\Model\CouponRequest $couponRequest (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['updateCoupon'] to see the possible values for this operation
@@ -2490,9 +2490,9 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function updateCouponAsync($code, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
+    public function updateCouponAsync($coupon, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
     {
-        return $this->updateCouponAsyncWithHttpInfo($code, $couponRequest, $idempotencyKey, $contentType)
+        return $this->updateCouponAsyncWithHttpInfo($coupon, $couponRequest, $idempotencyKey, $contentType)
             ->then(
                 function ($response) {
                     return $response[0];
@@ -2505,7 +2505,7 @@ class CouponsApi
      *
      * Replace a coupon&#39;s definition
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  \Cbox\Billing\Model\CouponRequest $couponRequest (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['updateCoupon'] to see the possible values for this operation
@@ -2513,10 +2513,10 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Promise\PromiseInterface
      */
-    public function updateCouponAsyncWithHttpInfo($code, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
+    public function updateCouponAsyncWithHttpInfo($coupon, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
     {
         $returnType = '\Cbox\Billing\Model\CouponDefinitionDetail';
-        $request = $this->updateCouponRequest($code, $couponRequest, $idempotencyKey, $contentType);
+        $request = $this->updateCouponRequest($coupon, $couponRequest, $idempotencyKey, $contentType);
 
         return $this->client
             ->sendAsync($request, $this->createHttpClientOption())
@@ -2557,7 +2557,7 @@ class CouponsApi
     /**
      * Create request for operation 'updateCoupon'
      *
-     * @param  string $code The coupon&#39;s code (the promo code), case-insensitive, or the coupon&#39;s public id (&#x60;cpn_…&#x60;). (required)
+     * @param  string $coupon The coupon&#39;s public id (&#x60;cpn_…&#x60;) or its code (the promo code), case-insensitive. (required)
      * @param  \Cbox\Billing\Model\CouponRequest $couponRequest (required)
      * @param  string|null $idempotencyKey An opaque, caller-generated key giving this write exactly-once semantics. A retry with the same key replays the first response instead of re-running the effect; reusing it with a different body is &#x60;409&#x60;. (optional)
      * @param  string $contentType The value for the Content-Type header. Check self::contentTypes['updateCoupon'] to see the possible values for this operation
@@ -2565,17 +2565,17 @@ class CouponsApi
      * @throws \InvalidArgumentException
      * @return \GuzzleHttp\Psr7\Request
      */
-    public function updateCouponRequest($code, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
+    public function updateCouponRequest($coupon, $couponRequest, $idempotencyKey = null, string $contentType = self::contentTypes['updateCoupon'][0])
     {
 
-        // verify the required parameter 'code' is set
-        if ($code === null || (is_array($code) && count($code) === 0)) {
+        // verify the required parameter 'coupon' is set
+        if ($coupon === null || (is_array($coupon) && count($coupon) === 0)) {
             throw new \InvalidArgumentException(
-                'Missing the required parameter $code when calling updateCoupon'
+                'Missing the required parameter $coupon when calling updateCoupon'
             );
         }
-        if (!preg_match("/^[A-Za-z0-9._-]+$/", $code)) {
-            throw new \InvalidArgumentException("invalid value for \"code\" when calling CouponsApi.updateCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
+        if (!preg_match("/^[A-Za-z0-9._-]+$/", $coupon)) {
+            throw new \InvalidArgumentException("invalid value for \"coupon\" when calling CouponsApi.updateCoupon, must conform to the pattern /^[A-Za-z0-9._-]+$/.");
         }
         
         // verify the required parameter 'couponRequest' is set
@@ -2587,7 +2587,7 @@ class CouponsApi
 
 
 
-        $resourcePath = '/coupons/{code}';
+        $resourcePath = '/coupons/{coupon}';
         $formParams = [];
         $queryParams = [];
         $headerParams = [];
@@ -2601,10 +2601,10 @@ class CouponsApi
         }
 
         // path params
-        if ($code !== null) {
+        if ($coupon !== null) {
             $resourcePath = str_replace(
-                '{code}',
-                ObjectSerializer::toPathValue($code),
+                '{coupon}',
+                ObjectSerializer::toPathValue($coupon),
                 $resourcePath
             );
         }

@@ -10,6 +10,7 @@ src/Api/DisputesApi.php
 src/Api/DunningApi.php
 src/Api/EnforcementApi.php
 src/Api/EnvironmentsApi.php
+src/Api/ExperimentsApi.php
 src/Api/InvoicesApi.php
 src/Api/LicenceDataApi.php
 src/Api/LicensesApi.php
@@ -21,9 +22,12 @@ src/Api/PaymentGatewaysApi.php
 src/Api/PaymentIntentsApi.php
 src/Api/PaymentMethodsApi.php
 src/Api/PlansApi.php
+src/Api/PricingTablesApi.php
 src/Api/ProductAccessApi.php
 src/Api/QuotesApi.php
+src/Api/RetentionApi.php
 src/Api/SeatsApi.php
+src/Api/SellersApi.php
 src/Api/ServiceConnectionsApi.php
 src/Api/SubscriptionsApi.php
 src/Api/TaxReturnsApi.php
@@ -186,6 +190,7 @@ src/Model/ChangeSubscriptionDates200Response.php
 src/Model/ChangeSubscriptionDatesRequest.php
 src/Model/ChargedInvoice.php
 src/Model/CheckServiceAdmission200Response.php
+src/Model/CheckoutLink.php
 src/Model/CheckoutSessionRequest.php
 src/Model/CheckoutSessionRequestItemsInner.php
 src/Model/ChooseAccountingContactImportRow200Response.php
@@ -198,6 +203,7 @@ src/Model/CommitmentRefusal.php
 src/Model/CommitmentRequest.php
 src/Model/CommitmentResponse.php
 src/Model/CommitmentTerm.php
+src/Model/ConcludeExperimentRequest.php
 src/Model/ConfirmAccountingContactImport200Response.php
 src/Model/ConfirmAccountingContactImportRequest.php
 src/Model/ConnectEngageService200Response.php
@@ -217,6 +223,7 @@ src/Model/CreateAffiliateProgramRequest.php
 src/Model/CreateAffiliateProgramRequestCommission.php
 src/Model/CreateAffiliateReferralRequest.php
 src/Model/CreateAffiliateRequest.php
+src/Model/CreateCheckoutLinkRequest.php
 src/Model/CreateCreditPurchase422Response.php
 src/Model/CreateCustomersFromAccountingContactImport200Response.php
 src/Model/CreateCustomersFromAccountingContactImport200ResponseCreatedInner.php
@@ -255,11 +262,15 @@ src/Model/CreditPoolScopeConditionsInner.php
 src/Model/CreditPurchase.php
 src/Model/CreditPurchaseCredit.php
 src/Model/CustomerContract.php
+src/Model/CustomerLifecycleRefusal.php
+src/Model/CustomerLifecycleState.php
 src/Model/CustomerOverageCapRow.php
 src/Model/CustomerOverageCapRowCustomer.php
 src/Model/DateChangePreview.php
 src/Model/DateChangeRequest.php
 src/Model/DeleteEntitlementOverride200Response.php
+src/Model/DeleteExperiment200Response.php
+src/Model/DeleteOrganization200Response.php
 src/Model/DeleteOverageCap200Response.php
 src/Model/DeleteSpendAlert200Response.php
 src/Model/DeleteWebhookEndpoint200Response.php
@@ -298,6 +309,10 @@ src/Model/EntitlementTerms.php
 src/Model/EntitlementsResponse.php
 src/Model/Environment.php
 src/Model/ErrorBody.php
+src/Model/Experiment.php
+src/Model/ExperimentInput.php
+src/Model/ExperimentInputVariantsInner.php
+src/Model/ExperimentVariant.php
 src/Model/ExportCatalog200Response.php
 src/Model/ExtendInvoiceDueDateRequest.php
 src/Model/Feature.php
@@ -397,6 +412,8 @@ src/Model/ListAgreements200Response.php
 src/Model/ListAllInvoices400Response.php
 src/Model/ListBankLines200Response.php
 src/Model/ListBankStatements200Response.php
+src/Model/ListCheckoutLinks200Response.php
+src/Model/ListCheckoutLinks200ResponseDataInner.php
 src/Model/ListConnectedFinancialEvents200Response.php
 src/Model/ListConnectedProductionEnvironments200Response.php
 src/Model/ListConnectedProductionEnvironments200ResponseDataInner.php
@@ -405,6 +422,7 @@ src/Model/ListDisputes200Response.php
 src/Model/ListDownloadGrants200Response.php
 src/Model/ListEntitlementOverrides200Response.php
 src/Model/ListEnvironments200Response.php
+src/Model/ListExperiments200Response.php
 src/Model/ListFinancialEvents200Response.php
 src/Model/ListFinancialEvents200ResponseDataInner.php
 src/Model/ListFinancialEvents200ResponseDataInnerData.php
@@ -420,9 +438,13 @@ src/Model/ListOrganizationPurchases200Response.php
 src/Model/ListOrganizationSubscriptions200Response.php
 src/Model/ListOverageCaps200Response.php
 src/Model/ListPlanMoves200Response.php
+src/Model/ListPricingTables200Response.php
 src/Model/ListPrivatePlans200Response.php
 src/Model/ListProductFiles200Response.php
+src/Model/ListRetentionOffers200Response.php
+src/Model/ListRetentionReasons200Response.php
 src/Model/ListScheduledCatalogChanges200Response.php
+src/Model/ListSellers200Response.php
 src/Model/ListServiceDirectory200Response.php
 src/Model/ListSignedAgreements200Response.php
 src/Model/ListSpendAlerts200Response.php
@@ -437,6 +459,8 @@ src/Model/MarkAffiliatePayoutPaidRequest.php
 src/Model/MarkInvoicePaidRequest.php
 src/Model/MatchBankLineRequest.php
 src/Model/MatchBankLineRequestAllocationsInner.php
+src/Model/MergeOrganizationRequest.php
+src/Model/MergeOrganizationRequestFields.php
 src/Model/Meter.php
 src/Model/MeterDetail.php
 src/Model/MeterDetailAllOfEntitlements.php
@@ -515,6 +539,8 @@ src/Model/PlaneInvoiceListAllOfData.php
 src/Model/PortalSessionRequest.php
 src/Model/PrepareTaxReturn200Response.php
 src/Model/PrepareTaxReturnRequest.php
+src/Model/PreviewOrganizationMerge200Response.php
+src/Model/PreviewOrganizationMergeRequest.php
 src/Model/PreviewRenewalAlignmentRequest.php
 src/Model/PreviewServiceInvitation200Response.php
 src/Model/PreviewServiceInvitation200ResponseInvitation.php
@@ -525,6 +551,9 @@ src/Model/PreviewSubscriptionCouponRequest.php
 src/Model/PriceLock.php
 src/Model/PriceLockState.php
 src/Model/PriceTax.php
+src/Model/PricingTable.php
+src/Model/PricingTableColumn.php
+src/Model/PricingTableInput.php
 src/Model/PrivatePlan.php
 src/Model/ProductDefinitionManifest.php
 src/Model/ProductDefinitionManifestFeaturesInner.php
@@ -578,9 +607,14 @@ src/Model/ResetEnvironment200Response.php
 src/Model/ResetEnvironmentRequest.php
 src/Model/ResetPeriod.php
 src/Model/ResourceLimit.php
+src/Model/RetentionOffer.php
+src/Model/RetentionOfferInput.php
+src/Model/RetentionReason.php
+src/Model/RetentionReasonInput.php
 src/Model/RetryAccountingSync202Response.php
 src/Model/RetryInvoiceDunningRequest.php
 src/Model/ReverseInvoicePaymentRequest.php
+src/Model/RevokeCheckoutLink200Response.php
 src/Model/RevokeLimitIncreaseRequest.php
 src/Model/SchedulePhase.php
 src/Model/SchedulePhaseRequest.php
@@ -601,6 +635,12 @@ src/Model/SeatTypeResponse.php
 src/Model/SeatTypeState.php
 src/Model/SeatTypeStateHoldersInner.php
 src/Model/SeatsSetRequest.php
+src/Model/Seller.php
+src/Model/SellerAddress.php
+src/Model/SellerBank.php
+src/Model/SellerInput.php
+src/Model/SellerInputRegistrationsInner.php
+src/Model/SellerRegistrationsInner.php
 src/Model/ServiceAdmissionIdentity.php
 src/Model/ServiceAdmissionInput.php
 src/Model/SetBackupCardConsent200Response.php
@@ -643,6 +683,7 @@ src/Model/SubscriptionPendingChange.php
 src/Model/SubscriptionStanding.php
 src/Model/SubscriptionTerms.php
 src/Model/SubscriptionTermsPrice.php
+src/Model/SuspendOrganizationRequest.php
 src/Model/SyncProductDefinitions200Response.php
 src/Model/SyncProductDefinitions200ResponseDataInner.php
 src/Model/TaxReturn.php
