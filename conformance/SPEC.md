@@ -65,7 +65,7 @@ Three different causes, three different errors:
 
 | Cause | Error | Depends on the failure policy? |
 | --- | --- | --- |
-| Billing answered and granted nothing: the allowance is spent, the meter is disabled, a pay-as-you-go pool or overage cap is reached, or an agreement is not accepted | `QuotaExceeded`, with a `reason` | No. Always refused. |
+| Billing answered a lease for the reservation and granted less than it needs: the allowance is spent, the meter is disabled, a pay-as-you-go pool or overage cap is reached, or an agreement is not accepted | `QuotaExceeded`, with a `reason` | No. Always refused. |
 | Billing refused the call (a 4xx other than 408 and 429, such as a revoked token) | `BillingRefused`, with the status | No. Always refused. |
 | Billing could not be reached (a network error, a timeout, a 5xx, 408, 429, or a malformed answer) | `BillingUnavailable` | Yes. |
 
@@ -101,6 +101,13 @@ gets an answer closes the breaker.
 
 A refill takes a lock in the store (`lock_ttl`, waiting up to `lock_wait`), and checks the slice
 again once it holds it, so a burst that empties a slice causes one lease, not one per request.
+
+A reservation that refills holds its units before it lets go: under the lock it takes them from
+the slice when another refill already filled it, and otherwise from its own lease's grant, adding
+only the rest to the slice. Other reservations on the same slice, in this process or another, can
+therefore never take them first. A reservation is refused with `QuotaExceeded` only when Billing
+answered a lease made for it and granted less than the reservation needs, and the slice with that
+grant still does not cover it.
 
 ## The last known allowance
 

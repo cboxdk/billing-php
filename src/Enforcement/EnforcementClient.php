@@ -470,11 +470,12 @@ final class EnforcementClient
             return new Hold($meter, $estimate, HoldKind::Lease);
         }
         try {
-            $answer = $this->refill($org, $meter, $estimate, false);
+            $answer = $this->refill($org, $meter, $estimate, false, true, $held);
         } catch (BillingUnavailableException $outage) {
             return $this->outageHold($org, $meter, $estimate, $outage);
         }
-        if ($this->take($org, $meter, $estimate)) {
+        // Unless the refill held it, Billing granted less than the estimate; the slice may still cover the rest.
+        if ($held || $this->take($org, $meter, $estimate)) {
             return new Hold($meter, $estimate, HoldKind::Lease);
         }
 
@@ -535,10 +536,18 @@ final class EnforcementClient
      * Lease at least `$want` units into the slice, single flight per (organization, meter). Returns
      * Billing's answer, or null when another refill already filled the slice.
      *
+     * With `$claim` it also holds `$want` for the caller, and sets `$held` to whether it did: from
+     * the slice while it holds the lock, or else straight from the grant, so no concurrent
+     * reservation can take them between the refill and the caller's take (#427). It holds nothing
+     * when Billing granted less.
+     *
+     * @param-out bool $held
+     *
      * @return array{granted: int, reason: string|null}|null
      */
-    private function refill(string $org, string $meter, int $want, bool $probe): ?array
+    private function refill(string $org, string $meter, int $want, bool $probe, bool $claim = false, ?bool &$held = null): ?array
     {
+        $held = false;
         $this->guard($probe);
         $lock = $this->key('lock', $org, $meter);
         $token = self::newId();
@@ -556,16 +565,20 @@ final class EnforcementClient
             // Could not join the single flight in time: refill directly rather than starve.
             $this->guard($probe);
 
-            return $this->lease($org, $meter, $want);
+            return $this->lease($org, $meter, $want, $claim, $held);
         }
 
         try {
-            if ($this->balance($org, $meter) >= $want) {
+            if ($claim) {
+                if ($held = $this->take($org, $meter, $want)) {
+                    return null;
+                }
+            } elseif ($this->balance($org, $meter) >= $want) {
                 return null;
             }
             $this->guard($probe);
 
-            return $this->lease($org, $meter, $want);
+            return $this->lease($org, $meter, $want, $claim, $held);
         } finally {
             if ($this->store->get($lock) === $token) {
                 $this->store->delete($lock);
@@ -573,9 +586,17 @@ final class EnforcementClient
         }
     }
 
-    /** @return array{granted: int, reason: string|null} */
-    private function lease(string $org, string $meter, int $want): array
+    /**
+     * Lease a slice and add the grant to it. With `$claim`, when the grant covers `$want`, keep
+     * `$want` back for the caller and set `$held`.
+     *
+     * @param-out bool $held
+     *
+     * @return array{granted: int, reason: string|null}
+     */
+    private function lease(string $org, string $meter, int $want, bool $claim = false, ?bool &$held = null): array
     {
+        $held = false;
         $size = max($this->leaseSize, $want);
         try {
             $answer = self::parseLease($this->transport->post('/leases', ['org' => $org, 'meter' => $meter, 'size' => $size], $this->leaseTimeout));
@@ -587,17 +608,27 @@ final class EnforcementClient
         }
 
         $this->store->delete($this->key('breaker'));
-        if ($answer['granted'] > 0) {
-            $this->store->increment($this->key('lease', $org, $meter), $answer['granted']);
+        $kept = $claim && $answer['granted'] >= $want ? $want : 0;
+        if ($answer['granted'] > $kept) {
+            $this->store->increment($this->key('lease', $org, $meter), $answer['granted'] - $kept);
         }
-        if ($this->store->add($this->key('claim', $org), '1', $this->snapshotRefresh)) {
-            try {
-                $this->fetchEntitlements($org);
-            } catch (EnforcementException) {
-                // Keep the previous snapshot; the next interval reads again.
+        try {
+            if ($this->store->add($this->key('claim', $org), '1', $this->snapshotRefresh)) {
+                try {
+                    $this->fetchEntitlements($org);
+                } catch (EnforcementException) {
+                    // Keep the previous snapshot; the next interval reads again.
+                }
             }
+            $this->recordLease($org, $meter, $size, $answer['granted']);
+        } catch (Throwable $e) {
+            // The caller gets the error, not a hold, so its units go to the slice after all.
+            if ($kept > 0) {
+                $this->store->increment($this->key('lease', $org, $meter), $kept);
+            }
+            throw $e;
         }
-        $this->recordLease($org, $meter, $size, $answer['granted']);
+        $held = $kept > 0;
 
         return $answer;
     }

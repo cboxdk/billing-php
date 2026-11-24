@@ -165,6 +165,92 @@ final class StoreTest extends TestCase
         $this->assertSame((string) $granted, $store->get($prefix.'usage:org_a:api'));
     }
 
+    /**
+     * Forked workers reserving from one small slice: a reservation is refused only when Billing
+     * has granted everything it had, never because another worker took the units a refill had
+     * just leased (#427).
+     *
+     * @return iterable<string, array{int}>
+     */
+    public static function limits(): iterable
+    {
+        yield 'no limit' => [0];
+        yield 'a limit of 5000' => [5000];
+    }
+
+    #[DataProvider('limits')]
+    public function test_forked_reservations_are_refused_only_when_billing_is_spent(int $limit): void
+    {
+        if (! function_exists('pcntl_fork')) {
+            $this->markTestSkipped('pcntl is not available.');
+        }
+        $reservations = 1600;
+        $estimate = 10;
+        $prefix = self::prefix('refused-only-when-spent');
+        $client = static function () use ($prefix, $limit): EnforcementClient {
+            $redis = self::redis();
+
+            return new EnforcementClient(
+                token: 'cbt_test',
+                baseUrl: 'http://billing.test/v1',
+                store: new RedisStore($redis),
+                leaseSize: 20,
+                prefix: $prefix,
+                deferRefill: false,
+                // Billing grants every lease in full, up to $limit units in all (0: no limit).
+                send: static function (string $method, string $url, array $headers, ?string $body) use ($redis, $prefix, $limit): array {
+                    if (! str_ends_with($url, '/leases')) {
+                        return [200, '{"meters":{"api":{"enabled":true,"allowance":null,"overage":"block"}}}'];
+                    }
+                    $size = (int) json_decode((string) $body, true)['size'];
+                    $grant = $size;
+                    if ($limit > 0) {
+                        $asked = (int) $redis(['INCRBY', $prefix.'test-asked', $size]);
+                        $grant = max(0, min($size, $limit - ($asked - $size)));
+                    }
+                    $redis(['INCRBY', $prefix.'test-granted', $grant]);
+
+                    return [200, json_encode(['lease_id' => 'lease', 'granted' => $grant, 'expires_at' => null])];
+                },
+            );
+        };
+
+        $pids = [];
+        for ($w = 0; $w < 16; $w++) {
+            $pid = pcntl_fork();
+            if ($pid === 0) {
+                // The child reports through Redis and kills itself, so PHPUnit's shutdown never
+                // runs twice.
+                try {
+                    $worker = $client();
+                    $shared = new RedisStore(self::redis());
+                    while ($shared->increment($prefix.'test-next', 1) <= $reservations) {
+                        try {
+                            $worker->commit($worker->reserve('org_a', 'api', $estimate), $estimate);
+                            $shared->increment($prefix.'test-committed', $estimate);
+                        } catch (QuotaExceededException) {
+                            $shared->increment($prefix.'test-refused', 1);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    (new RedisStore(self::redis()))->put($prefix.'test-error', $e::class.': '.$e->getMessage());
+                }
+                posix_kill(getmypid(), SIGKILL);
+            }
+            $pids[] = $pid;
+        }
+        foreach ($pids as $pid) {
+            pcntl_waitpid($pid, $status);
+        }
+
+        $store = new RedisStore(self::redis());
+        $this->assertNull($store->get($prefix.'test-error'), 'a worker failed');
+        $want = $limit > 0 ? $limit : $reservations * $estimate;
+        $this->assertSame((string) $want, $store->get($prefix.'test-committed'), sprintf('%s reservations refused', $store->get($prefix.'test-refused') ?? '0'));
+        $this->assertSame($reservations - intdiv($want, $estimate), (int) $store->get($prefix.'test-refused'));
+        $this->assertSame((int) $store->get($prefix.'test-granted'), $want + $client()->balance('org_a', 'api'));
+    }
+
     private static function prefix(string $name): string
     {
         static $run = 0;
